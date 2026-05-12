@@ -1,0 +1,38 @@
+# ── macOS ─────────────────────────────────────────────────────────────────────
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+.fseventsd
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# ── Editors / IDEs ────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.netrwhist
+Session.vim
+
+# ── Backups created by scripts/symlink.sh ─────────────────────────────────────
+*.bak
+*.orig
+
+# ── Local-only overrides (not tracked) ────────────────────────────────────────
+# Keep machine-specific secrets / overrides out of the repo.
+config/*.local
+config/.zshrc.local
+config/.gitconfig.local
+.env
+.env.*
+
+# ── Logs ──────────────────────────────────────────────────────────────────────
+*.log
+
+# ── Misc ──────────────────────────────────────────────────────────────────────
+.cache/
+tmp/
