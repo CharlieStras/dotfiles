@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+# Conventional Commits 1.0.0 validator
+# Spec: https://www.conventionalcommits.org/en/v1.0.0/
+#
+# Enable this hook once per clone:
+#   git config core.hooksPath .githooks
+
+set -e
+
+COMMIT_MSG_FILE="$1"
+
+# Skip merge / revert / fixup / squash commits (they are handled separately by git).
+first_line=$(head -n1 "$COMMIT_MSG_FILE")
+case "$first_line" in
+  "Merge "*|"Revert "*|"fixup! "*|"squash! "*|"amend! "*)
+    exit 0
+    ;;
+esac
+
+# Strip comment lines (starting with '#') that git adds to the template.
+subject=$(grep -v '^#' "$COMMIT_MSG_FILE" | sed '/./,$!d' | head -n1)
+
+# Allow empty messages (git itself will abort).
+if [ -z "$subject" ]; then
+  exit 0
+fi
+
+# Allowed types (kept in sync with COMMIT_CONVENTION.md).
+types='feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert'
+
+# Regex:
+#   <type>(<scope>)!?: <description>
+# - type: one of the allowed types
+# - scope: optional, kebab-case / path-like segments (letters, digits, . _ / -)
+# - optional '!' before the colon to mark a breaking change
+# - ': ' separator, then at least one non-space char for description
+pattern="^(${types})(\([a-z0-9._/-]+\))?!?: .+"
+
+if ! [[ "$subject" =~ $pattern ]]; then
+  echo ""
+  echo "❌  Commit rejected: subject does not follow Conventional Commits 1.0.0"
+  echo ""
+  echo "   Your subject:"
+  echo "     $subject"
+  echo ""
+  echo "   Required format:"
+  echo "     <type>(<scope>)!?: <description>"
+  echo ""
+  echo "   Allowed types: ${types//|/, }"
+  echo ""
+  echo "   Examples:"
+  echo "     feat(config/zsh): add fzf key bindings"
+  echo "     fix(scripts/symlink): handle paths with spaces"
+  echo "     chore(brewfile): bump mise to latest"
+  echo "     feat(bootstrap)!: require macOS 14+"
+  echo ""
+  echo "   See COMMIT_CONVENTION.md for full rules."
+  echo ""
+  exit 1
+fi
+
+# Soft length check (warn only, don't block).
+if [ ${#subject} -gt 100 ]; then
+  echo "⚠️   Commit subject is ${#subject} chars (> 100). Consider shortening."
+fi
+
+exit 0
