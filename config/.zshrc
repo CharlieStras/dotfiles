@@ -1,15 +1,13 @@
-# .zshrc - Zsh 配置
-# 由 dotfiles/config/.zshrc 软链到 ~/.zshrc
+# .zshrc - Zsh configuration
+# Symlinked from dotfiles/config/.zshrc to ~/.zshrc
 
 # ── Oh My Zsh ─────────────────────────────────────────────────────────────────
 export ZSH="$HOME/.oh-my-zsh"
-ZSH_THEME="robbyrussell"  # 主题，按需修改
+ZSH_THEME="robbyrussell"  # Theme, change as needed
 
 plugins=(
   git
   z
-  zsh-autosuggestions      # 需要额外安装: brew install zsh-autosuggestions
-  zsh-syntax-highlighting  # 需要额外安装: brew install zsh-syntax-highlighting
 )
 
 source $ZSH/oh-my-zsh.sh
@@ -19,13 +17,16 @@ if [[ -f "/opt/homebrew/bin/brew" ]]; then
   eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
-# ── 别名 ──────────────────────────────────────────────────────────────────────
+# ── Aliases ───────────────────────────────────────────────────────────────────
 alias ll="ls -lah"
 alias gs="git status"
 alias gc="git commit"
 alias gp="git push"
 alias vim="nvim"
 
-# ── 环境变量 ───────────────────────────────────────────────────────────────────
+# ── Environment variables ──────────────────────────────────────────────────────
 export EDITOR="nvim"
 export LANG="en_US.UTF-8"
+
+# Added by CodeBuddy CN - shell command
+export PATH="/Users/charliestras/.codebuddy/bin:$PATH"

@@ -39,17 +39,26 @@ fi
 echo "→ Installing packages from Brewfile..."
 brew bundle --file="$DOTFILES_DIR/Brewfile"
 
-# ── 4. Oh My Zsh ─────────────────────────────────────────────────────────────
+# ── 4. Build NeoVim ──────────────────────────────────────────────────────────
+mkdir -p "$HOME/Projects"
+if [[ ! -d "$HOME/Projects/neovim" ]]; then
+  git clone https://github.com/neovim/neovim "$HOME/Projects/neovim"
+  cd "$HOME/Projects/neovim"
+  make CMAKE_BUILD_TYPE=RelWithDebInfo
+  sudo make install
+fi
+
+# ── 5. Oh My Zsh ─────────────────────────────────────────────────────────────
 if [[ ! -d "$HOME/.oh-my-zsh" ]]; then
   echo "→ Installing Oh My Zsh..."
   sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 fi
 
-# ── 5. Sync config files ─────────────────────────────────────────────────────
+# ── 6. Sync config files ─────────────────────────────────────────────────────
 echo "→ Syncing config files..."
 bash "$DOTFILES_DIR/scripts/symlink.sh"
 
-# ── 6. macOS system preferences ──────────────────────────────────────────────
+# ── 7. macOS system preferences ──────────────────────────────────────────────
 read -p "Apply macOS system preferences? (y/N) " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
