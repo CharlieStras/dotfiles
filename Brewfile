@@ -2,6 +2,7 @@
 # Usage: brew bundle
 
 # CLI tools
+brew "bash"
 brew "git"
 brew "gh"
 brew "tmux"
@@ -17,3 +18,5 @@ cask "google-chrome"
 cask "ghostty"
 cask "raycast"
 cask "contexts"
+cask "wechat"
+cask "wechatwork"
