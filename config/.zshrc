@@ -6,6 +6,9 @@ export ZSH="$HOME/.oh-my-zsh"
 ZSH_THEME="robbyrussell"  # Theme, change as needed
 
 plugins=(
+  aliases
+  colored-man-pages
+  brew
   git
   z
 )
@@ -18,10 +21,6 @@ if [[ -f "/opt/homebrew/bin/brew" ]]; then
 fi
 
 # ── Aliases ───────────────────────────────────────────────────────────────────
-alias ll="ls -lah"
-alias gs="git status"
-alias gc="git commit"
-alias gp="git push"
 alias vim="nvim"
 
 # ── Environment variables ──────────────────────────────────────────────────────
