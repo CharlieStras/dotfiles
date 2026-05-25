@@ -54,11 +54,36 @@ if [[ ! -d "$HOME/.oh-my-zsh" ]]; then
   sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 fi
 
-# ── 6. Sync config files ─────────────────────────────────────────────────────
+# ── 6. SDKMAN + Java + Maven ─────────────────────────────────────────────────
+if [[ ! -d "$HOME/.sdkman" ]]; then
+  echo "→ Installing SDKMAN..."
+  curl -s "https://get.sdkman.io" | bash
+fi
+
+# Source SDKMAN so sdk command is available in this session
+export SDKMAN_DIR="$HOME/.sdkman"
+[[ -s "$SDKMAN_DIR/bin/sdkman-init.sh" ]] && source "$SDKMAN_DIR/bin/sdkman-init.sh"
+
+KONA_JAVA_VERSION="$(sdk list java | grep -E '^\s+.*\bkona\b' | grep '8\.' | awk '{print $NF}' | head -1)"
+if [[ -z "$KONA_JAVA_VERSION" ]]; then
+  echo "✗ Could not resolve Tencent Kona JDK 8 version from SDKMAN. Skipping Java install."
+elif ! sdk list java | grep -q "${KONA_JAVA_VERSION}.*installed"; then
+  echo "→ Installing Tencent Kona JDK 8 (${KONA_JAVA_VERSION})..."
+  sdk install java "${KONA_JAVA_VERSION}"
+else
+  echo "→ Tencent Kona JDK 8 (${KONA_JAVA_VERSION}) already installed."
+fi
+
+if ! sdk list maven | grep -q "installed"; then
+  echo "→ Installing Maven..."
+  sdk install maven
+fi
+
+# ── 7. Sync config files ─────────────────────────────────────────────────────
 echo "→ Syncing config files..."
 bash "$DOTFILES_DIR/scripts/symlink.sh"
 
-# ── 7. macOS system preferences ──────────────────────────────────────────────
+# ── 8. macOS system preferences ──────────────────────────────────────────────
 read -p "Apply macOS system preferences? (y/N) " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then

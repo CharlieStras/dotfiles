@@ -27,5 +27,9 @@ alias vim="nvim"
 export EDITOR="nvim"
 export LANG="en_US.UTF-8"
 
+# ── SDKMAN ────────────────────────────────────────────────────────────────────
+export SDKMAN_DIR="$HOME/.sdkman"
+[[ -s "$SDKMAN_DIR/bin/sdkman-init.sh" ]] && source "$SDKMAN_DIR/bin/sdkman-init.sh"
+
 # Added by CodeBuddy CN - shell command
 export PATH="/Users/charliestras/.codebuddy/bin:$PATH"
