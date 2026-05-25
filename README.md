@@ -39,9 +39,11 @@ After the script finishes, restart your terminal for all changes to take effect.
 1. Installs **Xcode Command Line Tools** (if missing) — on first run the script exits after the GUI installer launches; re-run it once that finishes.
 2. **Clones** this repo into `~/dotfiles` when executed via `curl`.
 3. Installs **Homebrew** and runs `brew bundle` against the `Brewfile`.
-4. Installs **Oh My Zsh** (unattended mode).
-5. Symlinks the files in `config/` into `$HOME` via `scripts/symlink.sh`.
-6. Prompts before applying **macOS system preferences** via `scripts/macos-defaults.sh`.
+4. Builds and installs **NeoVim** from source into `~/Projects/neovim`.
+5. Installs **Oh My Zsh** (unattended mode).
+6. Installs **SDKMAN**, then installs **Tencent Kona JDK 8** and **Maven** via `sdk`.
+7. Symlinks the files in `config/` into `$HOME` via `scripts/symlink.sh`.
+8. Prompts before applying **macOS system preferences** via `scripts/macos-defaults.sh`.
 
 ## Repository Layout
 
@@ -95,6 +97,8 @@ The bootstrap script is safe to re-run — it will:
 
 - Skip Xcode CLT / Homebrew / Oh My Zsh if already installed.
 - Let `brew bundle` reconcile any new entries in the `Brewfile`.
+- Skip the NeoVim build if `~/Projects/neovim` already exists.
+- Skip SDKMAN installation if `~/.sdkman` already exists; skip Java/Maven if already installed via `sdk`.
 - Skip symlinks that already point to the correct target.
 
 ## License

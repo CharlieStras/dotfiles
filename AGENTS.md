@@ -3,7 +3,8 @@
 ## Project Overview
 Personal macOS dotfiles repository. A single `bootstrap.sh` installs Xcode
 Command Line Tools, Homebrew, Oh My Zsh, runs `brew bundle` against the
-`Brewfile`, symlinks files in `config/` into `$HOME` via `scripts/symlink.sh`,
+`Brewfile`, builds NeoVim from source, installs SDKMAN with Tencent Kona JDK 8
+and Maven, symlinks files in `config/` into `$HOME` via `scripts/symlink.sh`,
 and optionally applies macOS defaults via `scripts/macos-defaults.sh`.
 
 ## Project Structure
