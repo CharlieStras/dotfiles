@@ -54,7 +54,7 @@ if [[ ! -d "$HOME/.oh-my-zsh" ]]; then
   sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 fi
 
-# ── 6. SDKMAN + Java + Maven ─────────────────────────────────────────────────
+# ── 6. SDKMAN + Java + Maven + Sbt ───────────────────────────────────────────
 if [[ ! -d "$HOME/.sdkman" ]]; then
   echo "→ Installing SDKMAN..."
   curl -s "https://get.sdkman.io" | bash
@@ -77,6 +77,11 @@ fi
 if ! sdk list maven | grep -q "installed"; then
   echo "→ Installing Maven..."
   sdk install maven
+fi
+
+if ! sdk list sbt | grep -q "installed"; then
+  echo "→ Installing Sbt..."
+  sdk install sbt
 fi
 
 # ── 7. Sync config files ─────────────────────────────────────────────────────

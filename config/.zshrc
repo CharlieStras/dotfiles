@@ -10,6 +10,8 @@ plugins=(
   colored-man-pages
   brew
   git
+  mvn
+  sbt
   z
 )
 
@@ -31,5 +33,5 @@ export LANG="en_US.UTF-8"
 export SDKMAN_DIR="$HOME/.sdkman"
 [[ -s "$SDKMAN_DIR/bin/sdkman-init.sh" ]] && source "$SDKMAN_DIR/bin/sdkman-init.sh"
 
-# Added by CodeBuddy CN - shell command
+# Added by CodeBuddy CN
 export PATH="/Users/charliestras/.codebuddy/bin:$PATH"
