@@ -33,5 +33,6 @@ export LANG="en_US.UTF-8"
 export SDKMAN_DIR="$HOME/.sdkman"
 [[ -s "$SDKMAN_DIR/bin/sdkman-init.sh" ]] && source "$SDKMAN_DIR/bin/sdkman-init.sh"
 
-# Added by CodeBuddy CN
-export PATH="/Users/charliestras/.codebuddy/bin:$PATH"
+source ~/.zshrc.local
+
+typeset -U path PATH
