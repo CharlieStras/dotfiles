@@ -6,6 +6,8 @@ brew "bash"
 brew "git"
 brew "gh"
 brew "tmux"
+brew "tree-sitter-cli"
+brew "lua-language-server"
 
 # Build neovim prerequistes
 brew "ninja"
