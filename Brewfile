@@ -8,6 +8,8 @@ brew "gh"
 brew "tmux"
 brew "tree-sitter-cli"
 brew "lua-language-server"
+brew "ripgrep"
+brew "fd"
 
 # Build neovim prerequistes
 brew "ninja"

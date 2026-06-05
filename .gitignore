@@ -33,6 +33,10 @@ config/.gitconfig.local
 # ── Logs ──────────────────────────────────────────────────────────────────────
 *.log
 
+# ── Neovim ────────────────────────────────────────────────────────────────────
+# lazy.nvim lockfile — managed per-machine, not synced across devices
+config/.config/nvim/lazy-lock.json
+
 # ── Misc ──────────────────────────────────────────────────────────────────────
 .cache/
 tmp/
