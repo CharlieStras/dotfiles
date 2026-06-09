@@ -1,6 +1,6 @@
 require("config.lazy")
 
-vim.opt.shiftwidth = 4
+vim.opt.shiftwidth = 2
 vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.clipboard = "unnamedplus"
@@ -9,27 +9,14 @@ vim.keymap.set("n", "<Space><Space>x", "<Cmd>source %<CR>")
 vim.keymap.set("n", "<Space>x", ":.lua<CR>")
 vim.keymap.set("v", "<Space>x", ":lua<CR>")
 
-vim.diagnostic.config({
-	virtual_text = true,
-	signs = true,
-	underline = true,
-	update_in_insert = false,
-	severity_sort = true,
-	float = {
-		border = "rounded",
-		source = true,
-	},
-})
+vim.keymap.set("n", "<M-j>", "<Cmd>cnext<CR>")
+vim.keymap.set("n", "<M-k>", "<Cmd>cprev<CR>")
 
-vim.api.nvim_create_autocmd("FileType", {
-	pattern = { "lua", "java", "scala", "markdown", "makrdown_inline" },
-	callback = function()
-		-- syntax highlighting, provided by Neovim
-		vim.treesitter.start()
-		-- folds, provided by Neovim
-		vim.wo[0][0].foldexpr = "v:lua.vim.treesitter.foldexpr()"
-		vim.wo[0][0].foldmethod = "expr"
-		-- indentation, provided by nvim-treesitter
-		vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
-	end,
-})
+vim.keymap.set("n", "-", "<Cmd>Oil<CR>")
+
+vim.keymap.set("n", "<Space>st", function()
+  vim.cmd.vnew()
+  vim.cmd.term()
+  vim.cmd.wincmd("J")
+  vim.api.nvim_win_set_height(0, 15)
+end)
