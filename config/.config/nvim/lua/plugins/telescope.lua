@@ -22,6 +22,9 @@ return {
 
     local builtin = require("telescope.builtin")
     vim.keymap.set("n", "<Space>ff", builtin.find_files)
+    vim.keymap.set("n", "<Space>fa", function()
+      builtin.find_files({ no_ignore = true })
+    end)
     vim.keymap.set("n", "<Space>fh", builtin.help_tags)
     vim.keymap.set("n", "<Space>fg", builtin.live_grep)
     vim.keymap.set("n", "<Space>en", function()
