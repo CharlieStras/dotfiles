@@ -52,10 +52,14 @@ git -C ~/dotfiles remote set-url origin git@github.com:CharlieStras/dotfiles.git
 2. **Clones** this repo into `~/dotfiles` when executed via `curl` (skipped if it is already there).
 3. Installs **Homebrew** and runs `brew bundle` against the `Brewfile`.
 4. Builds **NeoVim** (`nightly` by default, see `NVIM_REF`) from source in `~/Projects/neovim` and installs it into `~/.local` — no `sudo` needed.
-5. Installs **Oh My Zsh** (unattended mode).
-6. Installs **NVM**, then installs the latest LTS **Node.js**, sets it as the default, and installs global Node.js editor tools.
-7. Installs **SDKMAN**, then installs **Tencent Kona JDK 8** and **Maven** via `sdk`.
-8. Symlinks the files in `config/` into `$HOME` and writes local `~/.zshrc` / `~/.gitconfig` files that load `config/.zshrc` / `config/.gitconfig`, via `scripts/symlink.sh`.
+5. Installs **Oh My Zsh** (unattended mode, keeping any existing `~/.zshrc`).
+6. Symlinks the files in `config/` into `$HOME` and writes local `~/.zshrc` / `~/.gitconfig` files that load `config/.zshrc` / `config/.gitconfig`, via `scripts/symlink.sh`.
+7. Installs **NVM**, then installs the latest LTS **Node.js**, sets it as the default, and installs global Node.js editor tools.
+8. Installs **SDKMAN**, then installs **Tencent Kona JDK 8**, **Maven**, and **sbt** via `sdk`.
+
+   The NVM and SDKMAN installers append their loaders to the local `~/.zshrc`,
+   which is why config sync runs before them. The script warns if either
+   loader is missing afterwards.
 9. Prompts before applying **macOS system preferences** via `scripts/macos-defaults.sh`.
 
 ## Repository Layout
@@ -114,6 +118,18 @@ Keep machine-specific settings and secrets out of the repo:
 - **Zsh**: put them in `~/.zshrc` below the `source` line, or in
   `~/.zshrc.local`, which `config/.zshrc` sources last if it exists. Installers
   that append to `~/.zshrc` now write to that local file, not into the repo.
+  This includes the NVM and SDKMAN loaders: `config/.zshrc` does not load
+  them, so if `~/.zshrc` is ever regenerated, re-add them (the bootstrap
+  prints a warning when they are missing):
+
+  ```zsh
+  export NVM_DIR="$HOME/.nvm"
+  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+  [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+
+  export SDKMAN_DIR="$HOME/.sdkman"
+  [[ -s "$SDKMAN_DIR/bin/sdkman-init.sh" ]] && source "$SDKMAN_DIR/bin/sdkman-init.sh"
+  ```
 - **Git**: put them in `~/.gitconfig` itself (e.g. a work `user.email` or a
   managed `core.hooksPath`). That file only `[include]`s `config/.gitconfig`,
   so `git config --global` and tools that call it write there, not into the repo.
@@ -137,7 +153,7 @@ The bootstrap script is safe to re-run — it will:
 - Let `brew bundle` reconcile any new entries in the `Brewfile`.
 - Skip the NeoVim build if `~/.local/bin/nvim` exists; run `NVIM_UPDATE=1 bash bootstrap.sh` to rebuild from `NVIM_REF`.
 - Keep NVM at the pinned version, update the `default` alias to the latest LTS Node.js, and update global Node.js editor tools.
-- Skip SDKMAN installation if `~/.sdkman` already exists; skip Java/Maven if already installed via `sdk`.
+- Skip SDKMAN installation if it is already installed; skip Java/Maven/sbt if already installed via `sdk`. `sdk install` runs without prompts, so a newly installed version becomes the default.
 - Skip symlinks that already point to the correct target, and leave `~/.zshrc` / `~/.gitconfig` alone if they already load the repo copies.
 
 ## License

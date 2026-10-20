@@ -3,14 +3,20 @@
 ## Project Overview
 Personal macOS dotfiles repository. A single `bootstrap.sh` installs Xcode
 Command Line Tools, Homebrew, Oh My Zsh, runs `brew bundle` against the
-`Brewfile`, builds NeoVim from source, installs SDKMAN with Tencent Kona JDK 8
-and Maven, links files in `config/` into `$HOME` via `scripts/symlink.sh`,
-and optionally applies macOS defaults via `scripts/macos-defaults.sh`.
+`Brewfile`, builds NeoVim from source, links files in `config/` into `$HOME`
+via `scripts/symlink.sh`, installs NVM with LTS Node.js and SDKMAN with
+Tencent Kona JDK 8, Maven, and sbt, and optionally applies macOS defaults via
+`scripts/macos-defaults.sh`.
 
 `symlink.sh` symlinks everything except `.zshrc` and `.gitconfig`: those are
 local files that `source` / `[include]` the repo copies, so installer appends
 and `git config --global` writes (work email, managed `core.hooksPath`, ...)
 never land in the repo.
+
+NVM and SDKMAN loaders are written to the local `~/.zshrc` by their own
+installers, not kept in `config/.zshrc`. Keep config sync **before** the
+NVM/SDKMAN steps in `bootstrap.sh`, or their loaders end up in a file that
+`symlink.sh` then moves to `*.bak`.
 
 ## Project Structure
 ```

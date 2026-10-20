@@ -81,12 +81,18 @@ else
 fi
 
 # ── 5. Oh My Zsh ─────────────────────────────────────────────────────────────
+# --keep-zshrc: ~/.zshrc is written by symlink.sh in the next step
 if [[ ! -d "$HOME/.oh-my-zsh" ]]; then
   echo "→ Installing Oh My Zsh..."
-  sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+  sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended --keep-zshrc
 fi
 
-# ── 6. NVM + Node.js ─────────────────────────────────────────────────────────
+# ── 6. Sync config files ─────────────────────────────────────────────────────
+# Before NVM/SDKMAN, so their installers append to the final local ~/.zshrc
+echo "→ Syncing config files..."
+bash "$DOTFILES_DIR/scripts/symlink.sh"
+
+# ── 7. NVM + Node.js ─────────────────────────────────────────────────────────
 NVM_VERSION="v0.40.4"
 export NVM_DIR="$HOME/.nvm"
 
@@ -96,9 +102,10 @@ if [[ -s "$NVM_DIR/nvm.sh" ]]; then
   CURRENT_NVM_VERSION="v$(nvm --version)"
 fi
 
+# The installer appends its loader to ~/.zshrc unless one is already there
 if [[ "$CURRENT_NVM_VERSION" != "$NVM_VERSION" ]]; then
   echo "→ Installing NVM ${NVM_VERSION}..."
-  PROFILE=/dev/null NVM_DIR="$NVM_DIR" bash -c \
+  PROFILE="$HOME/.zshrc" NVM_DIR="$NVM_DIR" bash -c \
     "$(curl -fsSL "https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_VERSION}/install.sh")"
   source "$NVM_DIR/nvm.sh"
 fi
@@ -112,15 +119,19 @@ echo "→ Node.js $(node --version) installed via NVM."
 echo "→ Installing Node.js tools..."
 bash "$DOTFILES_DIR/scripts/install-node-tools.sh"
 
-# ── 7. SDKMAN + Java + Maven + Sbt ───────────────────────────────────────────
-if [[ ! -d "$HOME/.sdkman" ]]; then
+# ── 8. SDKMAN + Java + Maven + Sbt ───────────────────────────────────────────
+export SDKMAN_DIR="$HOME/.sdkman"
+
+# On first install, the installer appends its loader to ~/.zshrc and ~/.bash_profile
+if [[ ! -s "$SDKMAN_DIR/bin/sdkman-init.sh" ]]; then
   echo "→ Installing SDKMAN..."
-  curl -s "https://get.sdkman.io" | bash
+  curl -fsSL "https://get.sdkman.io" | bash
 fi
 
 # Source SDKMAN so sdk command is available in this session
-export SDKMAN_DIR="$HOME/.sdkman"
-[[ -s "$SDKMAN_DIR/bin/sdkman-init.sh" ]] && source "$SDKMAN_DIR/bin/sdkman-init.sh"
+source "$SDKMAN_DIR/bin/sdkman-init.sh"
+# Set after sourcing init, which loads etc/config (sdkman_auto_answer=false)
+sdkman_auto_answer=true
 
 # Return 0 if any installed version of candidate $1 matches glob $2 (default: any)
 sdk_has() {
@@ -150,9 +161,12 @@ if ! sdk_has sbt; then
   sdk install sbt
 fi
 
-# ── 8. Sync config files ─────────────────────────────────────────────────────
-echo "→ Syncing config files..."
-bash "$DOTFILES_DIR/scripts/symlink.sh"
+# Loaders live in the local ~/.zshrc, not in config/.zshrc; warn if one is missing
+for loader in "/nvm.sh:NVM" "sdkman-init.sh:SDKMAN"; do
+  if ! grep -Fq "${loader%%:*}" "$HOME/.zshrc"; then
+    echo "⚠ ~/.zshrc does not load ${loader##*:}; add its loader snippet manually."
+  fi
+done
 
 # ── 9. macOS system preferences ──────────────────────────────────────────────
 read -p "Apply macOS system preferences? (y/N) " -n 1 -r
