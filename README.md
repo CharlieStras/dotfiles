@@ -40,7 +40,7 @@ After the script finishes, restart your terminal for all changes to take effect.
 1. Installs **Xcode Command Line Tools** (if missing) — on first run the script exits after the GUI installer launches; re-run it once that finishes.
 2. **Clones** this repo into `~/dotfiles` when executed via `curl`.
 3. Installs **Homebrew** and runs `brew bundle` against the `Brewfile`.
-4. Builds and installs **NeoVim** from source into `~/Projects/neovim`.
+4. Builds **NeoVim** (`nightly` by default, see `NVIM_REF`) from source in `~/Projects/neovim` and installs it into `~/.local` — no `sudo` needed.
 5. Installs **Oh My Zsh** (unattended mode).
 6. Installs **SDKMAN**, then installs **Tencent Kona JDK 8** and **Maven** via `sdk`.
 7. Symlinks the files in `config/` into `$HOME` and writes a local `~/.gitconfig` that includes `config/.gitconfig`, via `scripts/symlink.sh`.
@@ -114,7 +114,7 @@ The bootstrap script is safe to re-run — it will:
 
 - Skip Xcode CLT / Homebrew / Oh My Zsh if already installed.
 - Let `brew bundle` reconcile any new entries in the `Brewfile`.
-- Skip the NeoVim build if `~/Projects/neovim` already exists.
+- Skip the NeoVim build if `~/.local/bin/nvim` exists; run `NVIM_UPDATE=1 ./bootstrap.sh` to rebuild from `NVIM_REF`.
 - Skip SDKMAN installation if `~/.sdkman` already exists; skip Java/Maven if already installed via `sdk`.
 - Skip symlinks that already point to the correct target, and leave `~/.gitconfig` alone if it already includes the repo copy.
 

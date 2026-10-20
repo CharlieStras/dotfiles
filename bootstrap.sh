@@ -40,12 +40,26 @@ echo "→ Installing packages from Brewfile..."
 brew bundle --file="$DOTFILES_DIR/Brewfile"
 
 # ── 4. Build NeoVim ──────────────────────────────────────────────────────────
-mkdir -p "$HOME/Projects"
-if [[ ! -d "$HOME/Projects/neovim" ]]; then
-  git clone https://github.com/neovim/neovim "$HOME/Projects/neovim"
-  cd "$HOME/Projects/neovim"
-  make CMAKE_BUILD_TYPE=RelWithDebInfo
-  sudo make install
+# Installs into ~/.local (on PATH via .zshrc), so no sudo is needed.
+# Skipped once installed; run with NVIM_UPDATE=1 to rebuild from NVIM_REF.
+NVIM_REF="nightly" # or a release tag like "v0.12.6"
+NVIM_SRC="$HOME/Projects/neovim"
+NVIM_PREFIX="$HOME/.local"
+
+if [[ ! -x "$NVIM_PREFIX/bin/nvim" || "${NVIM_UPDATE:-}" == 1 ]]; then
+  echo "→ Building NeoVim (${NVIM_REF})..."
+  if [[ ! -d "$NVIM_SRC/.git" ]]; then
+    mkdir -p "$(dirname "$NVIM_SRC")"
+    git clone https://github.com/neovim/neovim "$NVIM_SRC"
+  fi
+  # nightly/stable are moving tags, so force-update them
+  git -C "$NVIM_SRC" fetch --tags --force
+  git -C "$NVIM_SRC" checkout --detach "$NVIM_REF"
+  make -C "$NVIM_SRC" distclean
+  make -C "$NVIM_SRC" CMAKE_BUILD_TYPE=RelWithDebInfo CMAKE_INSTALL_PREFIX="$NVIM_PREFIX"
+  make -C "$NVIM_SRC" install
+else
+  echo "→ NeoVim already installed in $NVIM_PREFIX (set NVIM_UPDATE=1 to rebuild)."
 fi
 
 # ── 5. Oh My Zsh ─────────────────────────────────────────────────────────────
