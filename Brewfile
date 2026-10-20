@@ -27,3 +27,6 @@ cask "contexts"
 cask "wechat"
 cask "wechatwork"
 cask "tencent-meeting"
+
+# Fonts (icons in mini.icons / mini.statusline)
+cask "font-jetbrains-mono-nerd-font"
