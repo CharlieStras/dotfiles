@@ -63,7 +63,21 @@ if ! brew bundle --file="$DOTFILES_DIR/Brewfile"; then
   echo "⚠ Some Brewfile entries failed; continuing. Re-run \`brew bundle\` later."
 fi
 
-# ── 4. Build NeoVim ──────────────────────────────────────────────────────────
+# ── 4. Rust ──────────────────────────────────────────────────────────────────
+# blink.cmp builds its fuzzy matcher with cargo. Homebrew's rustup is keg-only,
+# so config/.zshrc puts its bin (the cargo/rustc proxies) on PATH
+RUSTUP_BIN="$(brew --prefix)/opt/rustup/bin"
+if [[ -x "$RUSTUP_BIN/rustup" ]]; then
+  export PATH="$PATH:$RUSTUP_BIN"
+  if ! rustup show active-toolchain &>/dev/null; then
+    echo "→ Installing the stable Rust toolchain..."
+    rustup default stable
+  fi
+else
+  echo "⚠ rustup not found; blink.cmp falls back to its Lua fuzzy matcher."
+fi
+
+# ── 5. Build NeoVim ──────────────────────────────────────────────────────────
 # Installs into ~/.local (on PATH via .zshrc), so no sudo is needed.
 # Skipped once installed; run with NVIM_UPDATE=1 to rebuild from NVIM_REF.
 NVIM_REF="nightly" # or a release tag like "v0.12.6"
@@ -86,19 +100,19 @@ else
   echo "→ NeoVim already installed in $NVIM_PREFIX (set NVIM_UPDATE=1 to rebuild)."
 fi
 
-# ── 5. Oh My Zsh ─────────────────────────────────────────────────────────────
+# ── 6. Oh My Zsh ─────────────────────────────────────────────────────────────
 # --keep-zshrc: ~/.zshrc is written by symlink.sh in the next step
 if [[ ! -d "$HOME/.oh-my-zsh" ]]; then
   echo "→ Installing Oh My Zsh..."
   sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended --keep-zshrc
 fi
 
-# ── 6. Sync config files ─────────────────────────────────────────────────────
+# ── 7. Sync config files ─────────────────────────────────────────────────────
 # Before NVM/SDKMAN, so their installers append to the final local ~/.zshrc
 echo "→ Syncing config files..."
 bash "$DOTFILES_DIR/scripts/symlink.sh"
 
-# ── 7. NVM + Node.js ─────────────────────────────────────────────────────────
+# ── 8. NVM + Node.js ─────────────────────────────────────────────────────────
 NVM_VERSION="v0.40.4"
 export NVM_DIR="$HOME/.nvm"
 
@@ -125,7 +139,7 @@ echo "→ Node.js $(node --version) installed via NVM."
 echo "→ Installing Node.js tools..."
 bash "$DOTFILES_DIR/scripts/install-node-tools.sh"
 
-# ── 8. SDKMAN + Java + Maven + Sbt ───────────────────────────────────────────
+# ── 9. SDKMAN + Java + Maven + Sbt ───────────────────────────────────────────
 export SDKMAN_DIR="$HOME/.sdkman"
 
 # On first install, the installer appends its loader to ~/.zshrc and ~/.bash_profile
@@ -174,7 +188,7 @@ for loader in "/nvm.sh:NVM" "sdkman-init.sh:SDKMAN"; do
   fi
 done
 
-# ── 9. macOS system preferences ──────────────────────────────────────────────
+# ── 10. macOS system preferences ─────────────────────────────────────────────
 read -p "Apply macOS system preferences? (y/N) " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then

@@ -11,6 +11,7 @@ brew "lua-language-server"
 brew "ripgrep"
 brew "fd"
 brew "stylua"
+brew "rustup" # cargo for blink.cmp's fuzzy matcher
 
 # Build neovim prerequistes
 brew "ninja"

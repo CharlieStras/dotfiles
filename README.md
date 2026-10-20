@@ -51,16 +51,17 @@ git -C ~/dotfiles remote set-url origin git@github.com:CharlieStras/dotfiles.git
 1. Installs **Xcode Command Line Tools** (if missing) — on first run the script exits after the GUI installer launches; re-run it once that finishes.
 2. **Clones** this repo into `~/dotfiles` when executed via `curl` (skipped if it is already there).
 3. Installs **Homebrew** and runs `brew bundle` against the `Brewfile`.
-4. Builds **NeoVim** (`nightly` by default, see `NVIM_REF`) from source in `~/Projects/neovim` and installs it into `~/.local` — no `sudo` needed.
-5. Installs **Oh My Zsh** (unattended mode, keeping any existing `~/.zshrc`).
-6. Symlinks the files in `config/` into `$HOME` and writes local `~/.zshrc` / `~/.gitconfig` files that load `config/.zshrc` / `config/.gitconfig`, via `scripts/symlink.sh`.
-7. Installs **NVM**, then installs the latest LTS **Node.js**, sets it as the default, and installs global Node.js editor tools.
-8. Installs **SDKMAN**, then installs **Tencent Kona JDK 8**, **Maven**, and **sbt** via `sdk`.
+4. Sets up **Rust** with the stable toolchain via Homebrew's `rustup`, so blink.cmp can build its native fuzzy matcher (without it, blink.cmp warns and falls back to Lua).
+5. Builds **NeoVim** (`nightly` by default, see `NVIM_REF`) from source in `~/Projects/neovim` and installs it into `~/.local` — no `sudo` needed.
+6. Installs **Oh My Zsh** (unattended mode, keeping any existing `~/.zshrc`).
+7. Symlinks the files in `config/` into `$HOME` and writes local `~/.zshrc` / `~/.gitconfig` files that load `config/.zshrc` / `config/.gitconfig`, via `scripts/symlink.sh`.
+8. Installs **NVM**, then installs the latest LTS **Node.js**, sets it as the default, and installs global Node.js editor tools.
+9. Installs **SDKMAN**, then installs **Tencent Kona JDK 8**, **Maven**, and **sbt** via `sdk`.
 
    The NVM and SDKMAN installers append their loaders to the local `~/.zshrc`,
    which is why config sync runs before them. The script warns if either
    loader is missing afterwards.
-9. Prompts before applying **macOS system preferences** via `scripts/macos-defaults.sh`.
+10. Prompts before applying **macOS system preferences** via `scripts/macos-defaults.sh`.
 
 ## Repository Layout
 
@@ -149,7 +150,7 @@ bash scripts/macos-defaults.sh
 
 The bootstrap script is safe to re-run — it will:
 
-- Skip Xcode CLT / Homebrew / Oh My Zsh if already installed.
+- Skip Xcode CLT / Homebrew / Oh My Zsh if already installed, and skip `rustup default stable` once a Rust toolchain is active.
 - Let `brew bundle` reconcile any new entries in the `Brewfile`. If some entries fail (e.g. a cask download), the remaining steps still run and the script reminds you at the end to check with `brew bundle check --verbose`.
 - Skip the NeoVim build if `~/.local/bin/nvim` exists; run `NVIM_UPDATE=1 bash bootstrap.sh` to rebuild from `NVIM_REF`.
 - Keep NVM at the pinned version, update the `default` alias to the latest LTS Node.js, and update global Node.js editor tools.

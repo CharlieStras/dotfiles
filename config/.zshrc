@@ -34,6 +34,10 @@ export LANG="en_US.UTF-8"
 
 # ── PATH ──────────────────────────────────────────────────────────────────────
 path=("$HOME/.local/bin" $path)
+# Homebrew's rustup is keg-only; appended so an existing ~/.cargo/bin wins
+if [[ -n "$HOMEBREW_PREFIX" && -d "$HOMEBREW_PREFIX/opt/rustup/bin" ]]; then
+  path+=("$HOMEBREW_PREFIX/opt/rustup/bin")
+fi
 
 [[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
 
