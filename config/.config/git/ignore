@@ -1,0 +1,8 @@
+# Global gitignore (XDG default path, read by git without config)
+# Only OS-generated files here; project artifacts belong in each repo's .gitignore
+
+# ── macOS ─────────────────────────────────────────────────────────────────────
+.DS_Store
+._*
+.AppleDouble
+.LSOverride

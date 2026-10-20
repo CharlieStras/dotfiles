@@ -7,6 +7,7 @@ CONFIG_DIR="$DOTFILES_DIR/config"
 # Files to symlink (paths are relative to config/)
 FILES=(
   ".zshrc"
+  ".config/git/ignore"
 )
 
 # Directories to symlink (paths are relative to config/)
@@ -77,6 +78,8 @@ for file in "${FILES[@]}"; do
     continue
   fi
 
+  # Ensure parent directory exists
+  mkdir -p "$(dirname "$dest")"
   link_target "$src" "$dest" "$file"
 done
 
