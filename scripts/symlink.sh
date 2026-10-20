@@ -6,7 +6,6 @@ CONFIG_DIR="$DOTFILES_DIR/config"
 
 # Files to symlink (paths are relative to config/)
 FILES=(
-  ".zshrc"
   ".config/git/ignore"
 )
 
@@ -41,16 +40,17 @@ link_target() {
   echo "  Linked $label → $dest"
 }
 
-# ~/.gitconfig is a local file that [include]s the repo copy instead of a
-# symlink, so `git config --global` writes stay on this machine
-include_gitconfig() {
+# Write a local $dest that loads the repo copy instead of symlinking it, so
+# tools that append to it (installers, `git config --global`) stay on this machine
+include_target() {
   local src="$1"
   local dest="$2"
+  local label="$3"
+  local content="$4"
 
-  # Already includes the repo copy → skip
-  if [[ -f "$dest" && ! -L "$dest" ]] &&
-    git config --file "$dest" --get-all include.path | grep -Fqx "$src"; then
-    echo "  Skipping .gitconfig (already included)"
+  # Already loads the repo copy → skip
+  if [[ -f "$dest" && ! -L "$dest" ]] && grep -Fq "$src" "$dest"; then
+    echo "  Skipping $label (already included)"
     return
   fi
 
@@ -65,8 +65,8 @@ include_gitconfig() {
     rm "$dest"
   fi
 
-  printf '[include]\n  path = %s\n' "$src" > "$dest"
-  echo "  Included .gitconfig → $dest"
+  printf '%s\n' "$content" > "$dest"
+  echo "  Included $label → $dest"
 }
 
 for file in "${FILES[@]}"; do
@@ -97,5 +97,8 @@ for dir in "${DIRS[@]}"; do
   link_target "$src" "$dest" "$dir"
 done
 
-include_gitconfig "$CONFIG_DIR/.gitconfig" "$HOME/.gitconfig"
+include_target "$CONFIG_DIR/.zshrc" "$HOME/.zshrc" ".zshrc" \
+  "$(printf '# Local zshrc; machine-specific lines can go below\nsource "%s"' "$CONFIG_DIR/.zshrc")"
+include_target "$CONFIG_DIR/.gitconfig" "$HOME/.gitconfig" ".gitconfig" \
+  "$(printf '[include]\n  path = %s' "$CONFIG_DIR/.gitconfig")"
 

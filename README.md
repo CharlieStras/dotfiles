@@ -7,7 +7,7 @@ Personal macOS setup — bootstraps a fresh machine with Homebrew packages, shel
 - **One-command bootstrap**: installs Xcode CLT, Homebrew, Oh My Zsh, and everything in the `Brewfile`.
 - **Declarative package management** via `Brewfile` (`brew bundle`).
 - **Safe linking** of config files into `$HOME` — existing regular files are backed up as `*.bak` before being replaced.
-- **Machine-local settings stay local**: `~/.gitconfig` includes the repo copy instead of being a symlink, so `git config --global` never writes into the repo.
+- **Machine-local settings stay local**: `~/.zshrc` and `~/.gitconfig` are local files that load the repo copies instead of symlinks, so installers and `git config --global` never write into the repo.
 - **Opt-in macOS defaults** (Dock auto-hide, etc.) applied only after confirmation.
 - **Idempotent**: re-running the script skips anything already installed or linked.
 
@@ -53,7 +53,7 @@ git -C ~/dotfiles remote set-url origin git@github.com:CharlieStras/dotfiles.git
 4. Builds **NeoVim** (`nightly` by default, see `NVIM_REF`) from source in `~/Projects/neovim` and installs it into `~/.local` — no `sudo` needed.
 5. Installs **Oh My Zsh** (unattended mode).
 6. Installs **SDKMAN**, then installs **Tencent Kona JDK 8** and **Maven** via `sdk`.
-7. Symlinks the files in `config/` into `$HOME` and writes a local `~/.gitconfig` that includes `config/.gitconfig`, via `scripts/symlink.sh`.
+7. Symlinks the files in `config/` into `$HOME` and writes local `~/.zshrc` / `~/.gitconfig` files that load `config/.zshrc` / `config/.gitconfig`, via `scripts/symlink.sh`.
 8. Prompts before applying **macOS system preferences** via `scripts/macos-defaults.sh`.
 
 ## Repository Layout
@@ -85,7 +85,6 @@ cask "visual-studio-code"
 2. Add its name to the `FILES` array in `scripts/symlink.sh`:
    ```bash
    FILES=(
-     ".zshrc"
      ".config/git/ignore"
      ".tmux.conf"
    )
@@ -99,16 +98,15 @@ Existing non-symlink files at the destination are moved to `<file>.bak` before b
 
 Keep machine-specific settings and secrets out of the repo:
 
-- **Zsh**: put them in `~/.zshrc.local`, which `.zshrc` sources last if it exists.
+- **Zsh**: put them in `~/.zshrc` below the `source` line, or in
+  `~/.zshrc.local`, which `config/.zshrc` sources last if it exists. Installers
+  that append to `~/.zshrc` now write to that local file, not into the repo.
 - **Git**: put them in `~/.gitconfig` itself (e.g. a work `user.email` or a
   managed `core.hooksPath`). That file only `[include]`s `config/.gitconfig`,
   so `git config --global` and tools that call it write there, not into the repo.
-  If a regular `~/.gitconfig` already existed, it is moved to `~/.gitconfig.bak`;
-  copy any settings you still need back into the new `~/.gitconfig`.
 
-`~/.zshrc` is still a symlink, so installers that append to it modify
-`config/.zshrc`. After installing a new tool, check `git diff` and move such
-lines to `~/.zshrc.local`.
+If a regular `~/.zshrc` or `~/.gitconfig` already existed, it is moved to
+`*.bak`; copy any settings you still need back into the new local file.
 
 ### Tweak macOS defaults
 
@@ -126,7 +124,7 @@ The bootstrap script is safe to re-run — it will:
 - Let `brew bundle` reconcile any new entries in the `Brewfile`.
 - Skip the NeoVim build if `~/.local/bin/nvim` exists; run `NVIM_UPDATE=1 bash bootstrap.sh` to rebuild from `NVIM_REF`.
 - Skip SDKMAN installation if `~/.sdkman` already exists; skip Java/Maven if already installed via `sdk`.
-- Skip symlinks that already point to the correct target, and leave `~/.gitconfig` alone if it already includes the repo copy.
+- Skip symlinks that already point to the correct target, and leave `~/.zshrc` / `~/.gitconfig` alone if they already load the repo copies.
 
 ## License
 

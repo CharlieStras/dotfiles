@@ -1,5 +1,5 @@
 # .zshrc - Zsh configuration
-# Symlinked from dotfiles/config/.zshrc to ~/.zshrc
+# Sourced from a local ~/.zshrc written by scripts/symlink.sh
 
 # ── Homebrew (Apple Silicon) ──────────────────────────────────────────────────
 # Before Oh My Zsh, so brew's site-functions are on fpath when compinit runs

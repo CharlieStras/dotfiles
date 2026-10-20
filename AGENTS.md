@@ -7,9 +7,10 @@ Command Line Tools, Homebrew, Oh My Zsh, runs `brew bundle` against the
 and Maven, links files in `config/` into `$HOME` via `scripts/symlink.sh`,
 and optionally applies macOS defaults via `scripts/macos-defaults.sh`.
 
-`symlink.sh` symlinks everything except `.gitconfig`: `~/.gitconfig` is a
-local file that `[include]`s `config/.gitconfig`, so `git config --global`
-writes (work email, managed `core.hooksPath`, ...) never land in the repo.
+`symlink.sh` symlinks everything except `.zshrc` and `.gitconfig`: those are
+local files that `source` / `[include]` the repo copies, so installer appends
+and `git config --global` writes (work email, managed `core.hooksPath`, ...)
+never land in the repo.
 
 ## Project Structure
 ```
@@ -19,7 +20,7 @@ dotfiles/
 ├── config/                 # Files linked into $HOME (incl. .config/git/ignore)
 ├── scripts/
 │   ├── symlink.sh          # Links config/ into $HOME, *.bak on conflict;
-│   │                       #   writes ~/.gitconfig with an [include]
+│   │                       #   writes ~/.zshrc, ~/.gitconfig that load the repo
 │   └── macos-defaults.sh   # macOS `defaults write` tweaks
 ├── .githooks/
 │   └── commit-msg          # Conventional Commits validator (enable per clone)
@@ -34,9 +35,9 @@ dotfiles/
 - **Filenames**: kebab-case for scripts, leading-dot for dotfiles in `config/`.
 - **Idempotency**: every installation/symlink step MUST be safe to re-run.
 - **No secrets**: never commit API tokens, SSH keys, or machine-specific
-  credentials. Put machine-local overrides outside the repo: `~/.zshrc.local`
-  for zsh, `~/.gitconfig` itself for git. Never hardcode `/Users/<name>` paths
-  in `config/`; use `$HOME`.
+  credentials. Put machine-local overrides outside the repo: `~/.zshrc` or
+  `~/.zshrc.local` for zsh, `~/.gitconfig` itself for git. Never hardcode
+  `/Users/<name>` paths in `config/`; use `$HOME`.
 
 ## Commit & Pull Request Guidelines
 
@@ -74,6 +75,3 @@ After this, non-conforming commit messages are rejected locally.
   before running.
 - `scripts/symlink.sh` backs up existing non-symlink targets as `*.bak` — do
   not commit those backups (already covered by `.gitignore`).
-- `~/.zshrc` is still a symlink, so installers that append to it modify
-  `config/.zshrc`. Review `git diff config/.zshrc` and move such lines to
-  `~/.zshrc.local` instead of committing them.
