@@ -38,6 +38,9 @@ export NVM_DIR="$HOME/.nvm"
 export SDKMAN_DIR="$HOME/.sdkman"
 [[ -s "$SDKMAN_DIR/bin/sdkman-init.sh" ]] && source "$SDKMAN_DIR/bin/sdkman-init.sh"
 
+# ── PATH ──────────────────────────────────────────────────────────────────────
+path=("$HOME/.local/bin" $path)
+
 [[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
 
 typeset -U path PATH
