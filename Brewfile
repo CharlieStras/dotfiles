@@ -10,6 +10,7 @@ brew "tree-sitter-cli"
 brew "lua-language-server"
 brew "ripgrep"
 brew "fd"
+brew "stylua"
 
 # Build neovim prerequistes
 brew "ninja"
