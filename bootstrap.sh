@@ -1,12 +1,18 @@
 #!/usr/bin/env bash
 # bootstrap.sh - Entry point for setting up a new machine
 # Usage: bash -c "$(curl -fsSL https://raw.githubusercontent.com/CharlieStras/dotfiles/main/bootstrap.sh)"
-# Or after cloning: cd dotfiles && ./bootstrap.sh
+# Or after cloning: cd dotfiles && bash bootstrap.sh
 
 set -eo pipefail
 
-DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DOTFILES_REPO="https://github.com/CharlieStras/dotfiles.git"
+
+# BASH_SOURCE is empty under `bash -c "$(curl ...)"`; fall back to ~/dotfiles
+if [[ -n "${BASH_SOURCE[0]:-}" && -f "$(dirname "${BASH_SOURCE[0]}")/Brewfile" ]]; then
+  DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+else
+  DOTFILES_DIR="$HOME/dotfiles"
+fi
 
 echo "⚡ Starting setup..."
 
@@ -20,10 +26,12 @@ fi
 
 # ── 2. Clone dotfiles (in case the script is run directly via curl) ──────────
 if [[ ! -f "$DOTFILES_DIR/Brewfile" ]]; then
+  if [[ -e "$DOTFILES_DIR" ]]; then
+    echo "✗ $DOTFILES_DIR exists but is not this dotfiles repo. Move it away and re-run."
+    exit 1
+  fi
   echo "→ Cloning dotfiles repo..."
-  git clone "$DOTFILES_REPO" "$HOME/dotfiles"
-  cd "$HOME/dotfiles"
-  DOTFILES_DIR="$HOME/dotfiles"
+  git clone "$DOTFILES_REPO" "$DOTFILES_DIR"
 fi
 
 # ── 3. Homebrew ───────────────────────────────────────────────────────────────

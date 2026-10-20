@@ -30,15 +30,25 @@ Or clone first and run locally:
 ```bash
 git clone https://github.com/CharlieStras/dotfiles.git ~/dotfiles
 cd ~/dotfiles
-./bootstrap.sh
+bash bootstrap.sh
 ```
 
 After the script finishes, restart your terminal for all changes to take effect.
 
+Re-running the `curl` command is safe: it reuses an existing `~/dotfiles`
+checkout instead of cloning again (it does not `git pull`; update it yourself).
+
+The repo is cloned over HTTPS because a fresh machine has no SSH key yet. Once
+your key is added to GitHub, switch the remote so you can push:
+
+```bash
+git -C ~/dotfiles remote set-url origin git@github.com:CharlieStras/dotfiles.git
+```
+
 ## What `bootstrap.sh` Does
 
 1. Installs **Xcode Command Line Tools** (if missing) — on first run the script exits after the GUI installer launches; re-run it once that finishes.
-2. **Clones** this repo into `~/dotfiles` when executed via `curl`.
+2. **Clones** this repo into `~/dotfiles` when executed via `curl` (skipped if it is already there).
 3. Installs **Homebrew** and runs `brew bundle` against the `Brewfile`.
 4. Builds **NeoVim** (`nightly` by default, see `NVIM_REF`) from source in `~/Projects/neovim` and installs it into `~/.local` — no `sudo` needed.
 5. Installs **Oh My Zsh** (unattended mode).
@@ -62,7 +72,7 @@ dotfiles/
 
 ### Add a package
 
-Edit `Brewfile` and re-run `brew bundle` (or `./bootstrap.sh`):
+Edit `Brewfile` and re-run `brew bundle` (or `bash bootstrap.sh`):
 
 ```ruby
 brew "ripgrep"
@@ -80,7 +90,7 @@ cask "visual-studio-code"
      ".tmux.conf"
    )
    ```
-3. Re-run `./bootstrap.sh` or `bash scripts/symlink.sh`.
+3. Re-run `bash bootstrap.sh` or `bash scripts/symlink.sh`.
 
 Missing parent directories (e.g. `~/.config/git`) are created automatically.
 Existing non-symlink files at the destination are moved to `<file>.bak` before being replaced, so you won't lose local changes.
@@ -114,7 +124,7 @@ The bootstrap script is safe to re-run — it will:
 
 - Skip Xcode CLT / Homebrew / Oh My Zsh if already installed.
 - Let `brew bundle` reconcile any new entries in the `Brewfile`.
-- Skip the NeoVim build if `~/.local/bin/nvim` exists; run `NVIM_UPDATE=1 ./bootstrap.sh` to rebuild from `NVIM_REF`.
+- Skip the NeoVim build if `~/.local/bin/nvim` exists; run `NVIM_UPDATE=1 bash bootstrap.sh` to rebuild from `NVIM_REF`.
 - Skip SDKMAN installation if `~/.sdkman` already exists; skip Java/Maven if already installed via `sdk`.
 - Skip symlinks that already point to the correct target, and leave `~/.gitconfig` alone if it already includes the repo copy.
 
