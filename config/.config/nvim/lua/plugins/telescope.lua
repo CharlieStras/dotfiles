@@ -1,22 +1,22 @@
 return {
-  'nvim-telescope/telescope.nvim',
-  version = '*',
+  "nvim-telescope/telescope.nvim",
+  version = "*",
   dependencies = {
-    'nvim-lua/plenary.nvim',
+    "nvim-lua/plenary.nvim",
     -- optional but recommended
-    { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
+    { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
   },
   config = function()
-    require("telescope").setup {
+    require("telescope").setup({
       pickers = {
         find_files = {
-          theme = "ivy"
-        }
+          theme = "ivy",
+        },
       },
       extensions = {
-        fzf = {}
-      }
-    }
+        fzf = {},
+      },
+    })
 
     require("telescope").load_extension("fzf")
 
@@ -25,17 +25,18 @@ return {
     vim.keymap.set("n", "<Space>fa", function()
       builtin.find_files({ no_ignore = true })
     end)
+    vim.keymap.set("n", "<Space>fb", builtin.buffers)
     vim.keymap.set("n", "<Space>fh", builtin.help_tags)
     vim.keymap.set("n", "<Space>fg", builtin.live_grep)
     vim.keymap.set("n", "<Space>en", function()
-      builtin.find_files {
-        cwd = vim.fn.stdpath("config")
-      }
+      builtin.find_files({
+        cwd = vim.fn.stdpath("config"),
+      })
     end)
     vim.keymap.set("n", "<Space>ep", function()
-      builtin.find_files {
-        cwd = vim.fs.joinpath(vim.fn.stdpath("data"), "lazy")
-      }
+      builtin.find_files({
+        cwd = vim.fs.joinpath(vim.fn.stdpath("data"), "lazy"),
+      })
     end)
   end,
 }
