@@ -1,13 +1,13 @@
 # .gitconfig
+# Included from ~/.gitconfig by scripts/symlink.sh; machine-local settings
+# (hooksPath, work email, ...) belong in ~/.gitconfig itself
 [user]
   name = charliestras
   email = charliestras@gmail.com
 
 [core]
   editor = nvim
-  excludesfile = ~/.gitignore_global
-	hooksPath = ~/.git-hooks
-	quotepath = false
+  quotepath = false
 
 [pull]
   rebase = false

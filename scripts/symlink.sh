@@ -7,7 +7,6 @@ CONFIG_DIR="$DOTFILES_DIR/config"
 # Files to symlink (paths are relative to config/)
 FILES=(
   ".zshrc"
-  ".gitconfig"
 )
 
 # Directories to symlink (paths are relative to config/)
@@ -41,6 +40,34 @@ link_target() {
   echo "  Linked $label → $dest"
 }
 
+# ~/.gitconfig is a local file that [include]s the repo copy instead of a
+# symlink, so `git config --global` writes stay on this machine
+include_gitconfig() {
+  local src="$1"
+  local dest="$2"
+
+  # Already includes the repo copy → skip
+  if [[ -f "$dest" && ! -L "$dest" ]] &&
+    git config --file "$dest" --get-all include.path | grep -Fqx "$src"; then
+    echo "  Skipping .gitconfig (already included)"
+    return
+  fi
+
+  # Existing non-symlink → back it up
+  if [[ -e "$dest" && ! -L "$dest" ]]; then
+    echo "  Backing up $dest → ${dest}.bak"
+    mv "$dest" "${dest}.bak"
+  fi
+
+  # Remove previous symlink
+  if [[ -L "$dest" ]]; then
+    rm "$dest"
+  fi
+
+  printf '[include]\n  path = %s\n' "$src" > "$dest"
+  echo "  Included .gitconfig → $dest"
+}
+
 for file in "${FILES[@]}"; do
   src="$CONFIG_DIR/$file"
   dest="$HOME/$file"
@@ -66,4 +93,6 @@ for dir in "${DIRS[@]}"; do
   mkdir -p "$(dirname "$dest")"
   link_target "$src" "$dest" "$dir"
 done
+
+include_gitconfig "$CONFIG_DIR/.gitconfig" "$HOME/.gitconfig"
 
