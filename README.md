@@ -150,7 +150,7 @@ bash scripts/macos-defaults.sh
 The bootstrap script is safe to re-run — it will:
 
 - Skip Xcode CLT / Homebrew / Oh My Zsh if already installed.
-- Let `brew bundle` reconcile any new entries in the `Brewfile`.
+- Let `brew bundle` reconcile any new entries in the `Brewfile`. If some entries fail (e.g. a cask download), the remaining steps still run and the script reminds you at the end to check with `brew bundle check --verbose`.
 - Skip the NeoVim build if `~/.local/bin/nvim` exists; run `NVIM_UPDATE=1 bash bootstrap.sh` to rebuild from `NVIM_REF`.
 - Keep NVM at the pinned version, update the `default` alias to the latest LTS Node.js, and update global Node.js editor tools.
 - Skip SDKMAN installation if it is already installed; skip Java/Maven/sbt if already installed via `sdk`. `sdk install` runs without prompts, so a newly installed version becomes the default.

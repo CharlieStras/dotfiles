@@ -55,7 +55,13 @@ if ! load_brew; then
 fi
 
 echo "→ Installing packages from Brewfile..."
-brew bundle --file="$DOTFILES_DIR/Brewfile"
+# brew bundle tries every entry and only then exits non-zero; most later steps
+# don't depend on every package, so report failures at the end instead of aborting
+BREW_BUNDLE_FAILED=0
+if ! brew bundle --file="$DOTFILES_DIR/Brewfile"; then
+  BREW_BUNDLE_FAILED=1
+  echo "⚠ Some Brewfile entries failed; continuing. Re-run \`brew bundle\` later."
+fi
 
 # ── 4. Build NeoVim ──────────────────────────────────────────────────────────
 # Installs into ~/.local (on PATH via .zshrc), so no sudo is needed.
@@ -173,6 +179,10 @@ read -p "Apply macOS system preferences? (y/N) " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
   bash "$DOTFILES_DIR/scripts/macos-defaults.sh"
+fi
+
+if [[ "$BREW_BUNDLE_FAILED" == 1 ]]; then
+  echo "⚠ brew bundle reported failures; run \`brew bundle check --verbose --file=$DOTFILES_DIR/Brewfile\` to see what is missing."
 fi
 
 echo ""
