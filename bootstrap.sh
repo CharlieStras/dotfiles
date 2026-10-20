@@ -100,17 +100,19 @@ else
   echo "→ NeoVim already installed in $NVIM_PREFIX (set NVIM_UPDATE=1 to rebuild)."
 fi
 
-# ── 6. Oh My Zsh ─────────────────────────────────────────────────────────────
-# --keep-zshrc: ~/.zshrc is written by symlink.sh in the next step
+# ── 6. Sync config files ─────────────────────────────────────────────────────
+# Before Oh My Zsh, so --keep-zshrc keeps this ~/.zshrc instead of writing its
+# template (which symlink.sh would then move to ~/.zshrc.bak), and before
+# NVM/SDKMAN, so their installers append to the final local ~/.zshrc
+echo "→ Syncing config files..."
+bash "$DOTFILES_DIR/scripts/symlink.sh"
+
+# ── 7. Oh My Zsh ─────────────────────────────────────────────────────────────
+# --keep-zshrc: keep the ~/.zshrc written by symlink.sh in the previous step
 if [[ ! -d "$HOME/.oh-my-zsh" ]]; then
   echo "→ Installing Oh My Zsh..."
   sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended --keep-zshrc
 fi
-
-# ── 7. Sync config files ─────────────────────────────────────────────────────
-# Before NVM/SDKMAN, so their installers append to the final local ~/.zshrc
-echo "→ Syncing config files..."
-bash "$DOTFILES_DIR/scripts/symlink.sh"
 
 # ── 8. NVM + Node.js ─────────────────────────────────────────────────────────
 NVM_VERSION="v0.40.4"

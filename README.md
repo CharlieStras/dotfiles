@@ -53,8 +53,8 @@ git -C ~/dotfiles remote set-url origin git@github.com:CharlieStras/dotfiles.git
 3. Installs **Homebrew** and runs `brew bundle` against the `Brewfile`.
 4. Sets up **Rust** with the stable toolchain via Homebrew's `rustup`, so blink.cmp can build its native fuzzy matcher (without it, blink.cmp warns and falls back to Lua).
 5. Builds **NeoVim** (`nightly` by default, see `NVIM_REF`) from source in `~/Projects/neovim` and installs it into `~/.local` — no `sudo` needed.
-6. Installs **Oh My Zsh** (unattended mode, keeping any existing `~/.zshrc`).
-7. Symlinks the files in `config/` into `$HOME` and writes local `~/.zshrc` / `~/.gitconfig` files that load `config/.zshrc` / `config/.gitconfig`, via `scripts/symlink.sh`.
+6. Symlinks the files in `config/` into `$HOME` and writes local `~/.zshrc` / `~/.gitconfig` files that load `config/.zshrc` / `config/.gitconfig`, via `scripts/symlink.sh`.
+7. Installs **Oh My Zsh** (unattended mode, keeping the `~/.zshrc` written in the previous step, so its template never replaces it).
 8. Installs **NVM**, then installs the latest LTS **Node.js**, sets it as the default, and installs global Node.js editor tools.
 9. Installs **SDKMAN**, then installs **Tencent Kona JDK 8**, **Maven**, and **sbt** via `sdk`.
 

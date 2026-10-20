@@ -2,9 +2,9 @@
 
 ## Project Overview
 Personal macOS dotfiles repository. A single `bootstrap.sh` installs Xcode
-Command Line Tools, Homebrew, Oh My Zsh, runs `brew bundle` against the
-`Brewfile`, sets up the stable Rust toolchain via `rustup`, builds NeoVim
-from source, links files in `config/` into `$HOME` via `scripts/symlink.sh`,
+Command Line Tools, Homebrew, runs `brew bundle` against the `Brewfile`, sets
+up the stable Rust toolchain via `rustup`, builds NeoVim from source, links
+files in `config/` into `$HOME` via `scripts/symlink.sh`, installs Oh My Zsh,
 installs NVM with LTS Node.js and SDKMAN with
 Tencent Kona JDK 8, Maven, and sbt, and optionally applies macOS defaults via
 `scripts/macos-defaults.sh`.
@@ -16,7 +16,8 @@ never land in the repo.
 
 NVM and SDKMAN loaders are written to the local `~/.zshrc` by their own
 installers, not kept in `config/.zshrc`. Keep config sync **before** the
-NVM/SDKMAN steps in `bootstrap.sh`, or their loaders end up in a file that
+Oh My Zsh and NVM/SDKMAN steps in `bootstrap.sh`: otherwise Oh My Zsh writes
+its template `~/.zshrc` and the NVM/SDKMAN loaders land in a file that
 `symlink.sh` then moves to `*.bak`.
 
 ## Project Structure
