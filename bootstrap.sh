@@ -64,22 +64,30 @@ fi
 export SDKMAN_DIR="$HOME/.sdkman"
 [[ -s "$SDKMAN_DIR/bin/sdkman-init.sh" ]] && source "$SDKMAN_DIR/bin/sdkman-init.sh"
 
-KONA_JAVA_VERSION="$(sdk list java | grep -E '^\s+.*\bkona\b' | grep '8\.' | awk '{print $NF}' | head -1)"
-if [[ -z "$KONA_JAVA_VERSION" ]]; then
-  echo "✗ Could not resolve Tencent Kona JDK 8 version from SDKMAN. Skipping Java install."
-elif ! sdk list java | grep -q "${KONA_JAVA_VERSION}.*installed"; then
-  echo "→ Installing Tencent Kona JDK 8 (${KONA_JAVA_VERSION})..."
-  sdk install java "${KONA_JAVA_VERSION}"
+# Return 0 if any installed version of candidate $1 matches glob $2 (default: any)
+sdk_has() {
+  local matches=("$SDKMAN_DIR/candidates/$1/"${2:-*})
+  [[ -d "${matches[0]}" ]]
+}
+
+if sdk_has java "8.*-kona"; then
+  echo "→ Tencent Kona JDK 8 already installed."
 else
-  echo "→ Tencent Kona JDK 8 (${KONA_JAVA_VERSION}) already installed."
+  KONA_JAVA_VERSION="$(sdk list java | awk -F'|' '$NF ~ /^ *8\..*-kona *$/ { gsub(/ /, "", $NF); print $NF; exit }')"
+  if [[ -z "$KONA_JAVA_VERSION" ]]; then
+    echo "✗ Could not resolve Tencent Kona JDK 8 version from SDKMAN. Skipping Java install."
+  else
+    echo "→ Installing Tencent Kona JDK 8 (${KONA_JAVA_VERSION})..."
+    sdk install java "${KONA_JAVA_VERSION}"
+  fi
 fi
 
-if ! sdk list maven | grep -q "installed"; then
+if ! sdk_has maven; then
   echo "→ Installing Maven..."
   sdk install maven
 fi
 
-if ! sdk list sbt | grep -q "installed"; then
+if ! sdk_has sbt; then
   echo "→ Installing Sbt..."
   sdk install sbt
 fi
