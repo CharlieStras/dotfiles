@@ -6,7 +6,8 @@ Personal macOS setup — bootstraps a fresh machine with Homebrew packages, shel
 
 - **One-command bootstrap**: installs Xcode CLT, Homebrew, Oh My Zsh, and everything in the `Brewfile`.
 - **Declarative package management** via `Brewfile` (`brew bundle`).
-- **Safe symlinking** of config files into `$HOME` — existing regular files are backed up as `*.bak` before being replaced.
+- **Safe linking** of config files into `$HOME` — existing regular files are backed up as `*.bak` before being replaced.
+- **Machine-local settings stay local**: `~/.gitconfig` includes the repo copy instead of being a symlink, so `git config --global` never writes into the repo.
 - **Opt-in macOS defaults** (Dock auto-hide, etc.) applied only after confirmation.
 - **Idempotent**: re-running the script skips anything already installed or linked.
 
@@ -42,7 +43,7 @@ After the script finishes, restart your terminal for all changes to take effect.
 4. Builds and installs **NeoVim** from source into `~/Projects/neovim`.
 5. Installs **Oh My Zsh** (unattended mode).
 6. Installs **SDKMAN**, then installs **Tencent Kona JDK 8** and **Maven** via `sdk`.
-7. Symlinks the files in `config/` into `$HOME` via `scripts/symlink.sh`.
+7. Symlinks the files in `config/` into `$HOME` and writes a local `~/.gitconfig` that includes `config/.gitconfig`, via `scripts/symlink.sh`.
 8. Prompts before applying **macOS system preferences** via `scripts/macos-defaults.sh`.
 
 ## Repository Layout
@@ -51,7 +52,7 @@ After the script finishes, restart your terminal for all changes to take effect.
 dotfiles/
 ├── bootstrap.sh            # Entry point — run this first
 ├── Brewfile                # Declarative list of brews/casks/taps
-├── config/                 # Files symlinked into $HOME (e.g. .zshrc, .gitconfig)
+├── config/                 # Files linked into $HOME (.zshrc, .gitconfig, .config/nvim, .config/git/ignore)
 └── scripts/
     ├── symlink.sh          # Links files from config/ into $HOME, backing up existing ones
     └── macos-defaults.sh   # macOS `defaults write` tweaks (Dock, etc.)
@@ -75,13 +76,29 @@ cask "visual-studio-code"
    ```bash
    FILES=(
      ".zshrc"
-     ".gitconfig"
+     ".config/git/ignore"
      ".tmux.conf"
    )
    ```
 3. Re-run `./bootstrap.sh` or `bash scripts/symlink.sh`.
 
+Missing parent directories (e.g. `~/.config/git`) are created automatically.
 Existing non-symlink files at the destination are moved to `<file>.bak` before being replaced, so you won't lose local changes.
+
+### Machine-local settings
+
+Keep machine-specific settings and secrets out of the repo:
+
+- **Zsh**: put them in `~/.zshrc.local`, which `.zshrc` sources last if it exists.
+- **Git**: put them in `~/.gitconfig` itself (e.g. a work `user.email` or a
+  managed `core.hooksPath`). That file only `[include]`s `config/.gitconfig`,
+  so `git config --global` and tools that call it write there, not into the repo.
+  If a regular `~/.gitconfig` already existed, it is moved to `~/.gitconfig.bak`;
+  copy any settings you still need back into the new `~/.gitconfig`.
+
+`~/.zshrc` is still a symlink, so installers that append to it modify
+`config/.zshrc`. After installing a new tool, check `git diff` and move such
+lines to `~/.zshrc.local`.
 
 ### Tweak macOS defaults
 
@@ -99,7 +116,7 @@ The bootstrap script is safe to re-run — it will:
 - Let `brew bundle` reconcile any new entries in the `Brewfile`.
 - Skip the NeoVim build if `~/Projects/neovim` already exists.
 - Skip SDKMAN installation if `~/.sdkman` already exists; skip Java/Maven if already installed via `sdk`.
-- Skip symlinks that already point to the correct target.
+- Skip symlinks that already point to the correct target, and leave `~/.gitconfig` alone if it already includes the repo copy.
 
 ## License
 
