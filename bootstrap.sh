@@ -86,7 +86,33 @@ if [[ ! -d "$HOME/.oh-my-zsh" ]]; then
   sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 fi
 
-# ── 6. SDKMAN + Java + Maven + Sbt ───────────────────────────────────────────
+# ── 6. NVM + Node.js ─────────────────────────────────────────────────────────
+NVM_VERSION="v0.40.4"
+export NVM_DIR="$HOME/.nvm"
+
+CURRENT_NVM_VERSION=""
+if [[ -s "$NVM_DIR/nvm.sh" ]]; then
+  source "$NVM_DIR/nvm.sh"
+  CURRENT_NVM_VERSION="v$(nvm --version)"
+fi
+
+if [[ "$CURRENT_NVM_VERSION" != "$NVM_VERSION" ]]; then
+  echo "→ Installing NVM ${NVM_VERSION}..."
+  PROFILE=/dev/null NVM_DIR="$NVM_DIR" bash -c \
+    "$(curl -fsSL "https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_VERSION}/install.sh")"
+  source "$NVM_DIR/nvm.sh"
+fi
+
+echo "→ Installing the latest LTS Node.js..."
+nvm install --lts
+nvm alias default "lts/*"
+nvm use default
+echo "→ Node.js $(node --version) installed via NVM."
+
+echo "→ Installing Node.js tools..."
+bash "$DOTFILES_DIR/scripts/install-node-tools.sh"
+
+# ── 7. SDKMAN + Java + Maven + Sbt ───────────────────────────────────────────
 if [[ ! -d "$HOME/.sdkman" ]]; then
   echo "→ Installing SDKMAN..."
   curl -s "https://get.sdkman.io" | bash
@@ -124,11 +150,11 @@ if ! sdk_has sbt; then
   sdk install sbt
 fi
 
-# ── 7. Sync config files ─────────────────────────────────────────────────────
+# ── 8. Sync config files ─────────────────────────────────────────────────────
 echo "→ Syncing config files..."
 bash "$DOTFILES_DIR/scripts/symlink.sh"
 
-# ── 8. macOS system preferences ──────────────────────────────────────────────
+# ── 9. macOS system preferences ──────────────────────────────────────────────
 read -p "Apply macOS system preferences? (y/N) " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then

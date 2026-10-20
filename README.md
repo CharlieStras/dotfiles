@@ -6,6 +6,7 @@ Personal macOS setup — bootstraps a fresh machine with Homebrew packages, shel
 
 - **One-command bootstrap**: installs Xcode CLT, Homebrew, Oh My Zsh, and everything in the `Brewfile`.
 - **Declarative package management** via `Brewfile` (`brew bundle`).
+- **Node.js via NVM**: installs a pinned NVM release and selects the latest LTS Node.js by default.
 - **Safe linking** of config files into `$HOME` — existing regular files are backed up as `*.bak` before being replaced.
 - **Machine-local settings stay local**: `~/.zshrc` and `~/.gitconfig` are local files that load the repo copies instead of symlinks, so installers and `git config --global` never write into the repo.
 - **Opt-in macOS defaults** (Dock auto-hide, etc.) applied only after confirmation.
@@ -52,9 +53,10 @@ git -C ~/dotfiles remote set-url origin git@github.com:CharlieStras/dotfiles.git
 3. Installs **Homebrew** and runs `brew bundle` against the `Brewfile`.
 4. Builds **NeoVim** (`nightly` by default, see `NVIM_REF`) from source in `~/Projects/neovim` and installs it into `~/.local` — no `sudo` needed.
 5. Installs **Oh My Zsh** (unattended mode).
-6. Installs **SDKMAN**, then installs **Tencent Kona JDK 8** and **Maven** via `sdk`.
-7. Symlinks the files in `config/` into `$HOME` and writes local `~/.zshrc` / `~/.gitconfig` files that load `config/.zshrc` / `config/.gitconfig`, via `scripts/symlink.sh`.
-8. Prompts before applying **macOS system preferences** via `scripts/macos-defaults.sh`.
+6. Installs **NVM**, then installs the latest LTS **Node.js**, sets it as the default, and installs global Node.js editor tools.
+7. Installs **SDKMAN**, then installs **Tencent Kona JDK 8** and **Maven** via `sdk`.
+8. Symlinks the files in `config/` into `$HOME` and writes local `~/.zshrc` / `~/.gitconfig` files that load `config/.zshrc` / `config/.gitconfig`, via `scripts/symlink.sh`.
+9. Prompts before applying **macOS system preferences** via `scripts/macos-defaults.sh`.
 
 ## Repository Layout
 
@@ -64,6 +66,7 @@ dotfiles/
 ├── Brewfile                # Declarative list of brews/casks/taps
 ├── config/                 # Files linked into $HOME (.zshrc, .gitconfig, .config/nvim, .config/git/ignore)
 └── scripts/
+    ├── install-node-tools.sh # Installs global TypeScript/Neovim tooling via npm
     ├── symlink.sh          # Links files from config/ into $HOME, backing up existing ones
     └── macos-defaults.sh   # macOS `defaults write` tweaks (Dock, etc.)
 ```
@@ -78,6 +81,16 @@ Edit `Brewfile` and re-run `brew bundle` (or `bash bootstrap.sh`):
 brew "ripgrep"
 cask "visual-studio-code"
 ```
+
+Node.js and NVM are intentionally not listed in the `Brewfile`. NVM is pinned
+in `bootstrap.sh`, while `nvm install --lts` installs the latest LTS Node.js
+and assigns the `lts/*` release line to the `default` alias.
+
+The bootstrap also runs `scripts/install-node-tools.sh`, which installs the
+latest versions of `@vtsls/language-server`, `typescript`,
+`vscode-langservers-extracted`, `@fsouza/prettierd`, and `prettier` globally.
+Projects should still pin TypeScript, ESLint, and Prettier in their own
+`devDependencies` so project-specific versions and configuration take priority.
 
 ### Add a config file
 
@@ -123,6 +136,7 @@ The bootstrap script is safe to re-run — it will:
 - Skip Xcode CLT / Homebrew / Oh My Zsh if already installed.
 - Let `brew bundle` reconcile any new entries in the `Brewfile`.
 - Skip the NeoVim build if `~/.local/bin/nvim` exists; run `NVIM_UPDATE=1 bash bootstrap.sh` to rebuild from `NVIM_REF`.
+- Keep NVM at the pinned version, update the `default` alias to the latest LTS Node.js, and update global Node.js editor tools.
 - Skip SDKMAN installation if `~/.sdkman` already exists; skip Java/Maven if already installed via `sdk`.
 - Skip symlinks that already point to the correct target, and leave `~/.zshrc` / `~/.gitconfig` alone if they already load the repo copies.
 
