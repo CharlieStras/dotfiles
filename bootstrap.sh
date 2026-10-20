@@ -35,13 +35,23 @@ if [[ ! -f "$DOTFILES_DIR/Brewfile" ]]; then
 fi
 
 # ── 3. Homebrew ───────────────────────────────────────────────────────────────
-if ! command -v brew &>/dev/null; then
+# Put an existing brew on PATH first: /opt/homebrew is not on the default PATH,
+# so `command -v brew` alone would re-run the installer on Apple Silicon
+load_brew() {
+  local brew_bin
+  for brew_bin in /opt/homebrew/bin/brew /usr/local/bin/brew; do
+    if [[ -x "$brew_bin" ]]; then
+      eval "$("$brew_bin" shellenv)"
+      return 0
+    fi
+  done
+  return 1
+}
+
+if ! load_brew; then
   echo "→ Installing Homebrew..."
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-  # Apple Silicon path
-  if [[ -f "/opt/homebrew/bin/brew" ]]; then
-    eval "$(/opt/homebrew/bin/brew shellenv)"
-  fi
+  load_brew || { echo "✗ Homebrew installed but brew was not found."; exit 1; }
 fi
 
 echo "→ Installing packages from Brewfile..."
