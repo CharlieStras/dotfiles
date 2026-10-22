@@ -37,6 +37,11 @@ config/.gitconfig.local
 # lazy.nvim lockfile — managed per-machine, not synced across devices
 config/.config/nvim/lazy-lock.json
 
+# ── tmux ──────────────────────────────────────────────────────────────────────
+# Machine-local overrides and TPM-installed plugins
+config/.config/tmux/tmux.local.conf
+config/.config/tmux/plugins/
+
 # ── Misc ──────────────────────────────────────────────────────────────────────
 .cache/
 tmp/

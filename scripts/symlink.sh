@@ -12,6 +12,7 @@ FILES=(
 # Directories to symlink (paths are relative to config/)
 DIRS=(
   ".config/nvim"
+  ".config/tmux"
 )
 
 link_target() {
