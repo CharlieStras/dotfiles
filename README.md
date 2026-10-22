@@ -69,7 +69,7 @@ git -C ~/dotfiles remote set-url origin git@github.com:CharlieStras/dotfiles.git
 dotfiles/
 ├── bootstrap.sh            # Entry point — run this first
 ├── Brewfile                # Declarative list of brews/casks/taps
-├── config/                 # Files linked into $HOME (.zshrc, .gitconfig, .config/nvim, .config/git/ignore)
+├── config/                 # Files linked into $HOME (.zshrc, .gitconfig, .config/nvim, .config/tmux, .config/git/ignore)
 └── scripts/
     ├── install-node-tools.sh # Installs global TypeScript/Neovim tooling via npm
     ├── symlink.sh          # Links files from config/ into $HOME, backing up existing ones
@@ -99,15 +99,17 @@ Projects should still pin TypeScript, ESLint, and Prettier in their own
 
 ### Add a config file
 
-1. Drop the file into `config/` (e.g. `config/.tmux.conf`).
+1. Drop the file into `config/` (e.g. `config/.config/foo/config`).
 2. Add its name to the `FILES` array in `scripts/symlink.sh`:
    ```bash
    FILES=(
      ".config/git/ignore"
-     ".tmux.conf"
+     ".config/foo/config"
    )
    ```
 3. Re-run `bash bootstrap.sh` or `bash scripts/symlink.sh`.
+
+Whole directories (e.g. `.config/nvim`, `.config/tmux`) go in the `DIRS` array instead.
 
 Missing parent directories (e.g. `~/.config/git`) are created automatically.
 Existing non-symlink files at the destination are moved to `<file>.bak` before being replaced, so you won't lose local changes.
